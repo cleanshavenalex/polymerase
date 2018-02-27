@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -16,10 +17,13 @@ const (
 	retrydelayseconds = 3
 )
 
+// VaultConfig stores configuration settings for the Vault Client
 type VaultConfig struct {
-	Server string // protocol, hostname and port (https://vault.foo.com:8200)
+	Server          string // protocol, hostname and port (https://vault.foo.com:8200)
+	GetValueRetries int
 }
 
+// VaultClient is used to communicate with Vault
 type VaultClient struct {
 	client *api.Client
 	config *VaultConfig
@@ -29,6 +33,9 @@ type VaultClient struct {
 // NewClient returns a VaultClient object or error
 func NewClient(config *VaultConfig) (*VaultClient, error) {
 	vc := VaultClient{}
+	// TODO - does this depend on the config.Server being up?
+	// does the vault api client have a retry option?
+	// should a retry be done here? or by the caller of this func ^^
 	c, err := api.NewClient(&api.Config{Address: config.Server})
 	vc.client = c
 	vc.config = config
@@ -115,6 +122,19 @@ func (c *VaultClient) GetValue(path string) (interface{}, error) {
 	c.client.SetToken(c.token)
 	lc := c.client.Logical()
 	s, err := lc.Read(path)
+	if err != nil {
+		if c.config.GetValueRetries > 0 {
+			jitter := time.Duration(rand.Int63n(int64(2 * time.Second)))
+			time.Sleep(jitter)
+			for i := 0; i < c.config.GetValueRetries; i++ {
+				s, err = lc.Read(path)
+				if err == nil {
+					break
+				}
+				time.Sleep((retrydelayseconds * 2) * time.Second)
+			}
+		}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error reading secret from Vault: %v: %v", path, err)
 	}

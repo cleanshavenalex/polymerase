@@ -7,13 +7,14 @@ import (
 
 // Config for polymerase
 type Config struct {
-	VaultAddr        string
-	VaultToken       string
-	VaultAppID       string
-	VaultUserIDPath  string
-	VaultFactoryFunc func(Config) (Vault, error)
-	Input            io.Reader
-	Output           io.Writer
+	VaultAddr            string
+	VaultToken           string
+	VaultAppID           string
+	VaultUserIDPath      string
+	VaultGetValueRetries int
+	VaultFactoryFunc     func(Config) (Vault, error)
+	Input                io.Reader
+	Output               io.Writer
 }
 
 // Validate the config
