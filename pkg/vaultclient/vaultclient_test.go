@@ -67,9 +67,22 @@ func TestVaultGetValue(t *testing.T) {
 	log.Printf("Got value: %v", d.(string))
 }
 
-func TestVaultRetryGetValue(t *testing.T) {
-	if len(os.Getenv("VAULT_CLIENT_TEST")) == 0 {
-		t.Skip("skipping test, VAULT_CLIENT_TEST not set")
-	}
+var testRetryConfig = VaultConfig{
+	Server:          os.Getenv("VAULT_ADDR"),
+	GetValueRetries: 2,
+}
 
+func TestVaultRetryGetValue(t *testing.T) {
+	vc, err := NewClient(&testRetryConfig)
+	if err != nil {
+		log.Fatalf("Error creating client: %v", err)
+	}
+	_, err = vc.GetValue(testSecretPath)
+	if err != nil {
+		log.Fatalf("Error getting value: %v", err)
+	}
+	// TODO get a first call to vc.GetValue to fail
+	// validate it was retried and successful
+
+	// TODO test max retries exceeded
 }

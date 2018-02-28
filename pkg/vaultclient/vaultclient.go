@@ -127,7 +127,11 @@ func (c *VaultClient) GetValue(path string) (interface{}, error) {
 		jitter := time.Duration(rand.Int63n(5.0)) * time.Second
 		time.Sleep(jitter)
 		expoSleep := retrydelayseconds
-		for i := 0; i < c.config.GetValueRetries; i++ {
+		timesToRetry := maxValueRetries
+		if c.config.GetValueRetries < timesToRetry {
+			timesToRetry = c.config.GetValueRetries
+		}
+		for i := 0; i < timesToRetry; i++ {
 			s, err = lc.Read(path)
 			if err == nil {
 				break
