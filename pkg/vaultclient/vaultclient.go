@@ -122,17 +122,15 @@ func (c *VaultClient) GetValue(path string) (interface{}, error) {
 	c.client.SetToken(c.token)
 	lc := c.client.Logical()
 	s, err := lc.Read(path)
-	if err != nil {
-		if c.config.GetValueRetries > 0 {
-			jitter := time.Duration(rand.Int63n(int64(2 * time.Second)))
-			time.Sleep(jitter)
-			for i := 0; i < c.config.GetValueRetries; i++ {
-				s, err = lc.Read(path)
-				if err == nil {
-					break
-				}
-				time.Sleep((retrydelayseconds * 2) * time.Second)
+	if err != nil && c.config.GetValueRetries > 0 {
+		jitter := time.Duration(rand.Int63n(int64((2 * retrydelayseconds) * time.Second)))
+		time.Sleep(jitter / 2)
+		for i := 0; i < c.config.GetValueRetries; i++ {
+			s, err = lc.Read(path)
+			if err == nil {
+				break
 			}
+			time.Sleep((retrydelayseconds * 2) * time.Second)
 		}
 	}
 	if err != nil {
