@@ -11,6 +11,7 @@ type Config struct {
 	VaultToken       string
 	VaultAppID       string
 	VaultUserIDPath  string
+	VaultMaxRetries  int
 	VaultFactoryFunc func(Config) (Vault, error)
 	Input            io.Reader
 	Output           io.Writer

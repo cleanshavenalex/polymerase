@@ -26,6 +26,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&config.VaultAddr, "vault-addr", "v", os.Getenv("VAULT_ADDR"), "Vault server address (including protocol and port). Can use VAULT_ADDR environment variable instead.")
 	rootCmd.PersistentFlags().StringVarP(&config.VaultToken, "vault-token", "t", os.Getenv("VAULT_TOKEN"), "Vault token. Can use VAULT_TOKEN environment variable instead.")
 	rootCmd.PersistentFlags().StringVarP(&config.VaultUserIDPath, "user-id-path", "u", os.Getenv("USER_ID_PATH"), "Path to user id. Can use USER_ID_PATH environment variable instead.")
+	rootCmd.PersistentFlags().IntVarP(&config.VaultMaxRetries, "vault-max-retries", "r", 0, "Maximum number of retries Vault will attempt.")
 }
 
 func main() {
