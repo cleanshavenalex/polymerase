@@ -16,10 +16,13 @@ const (
 	retrydelayseconds = 3
 )
 
+// VaultConfig used to create the Vault Client
 type VaultConfig struct {
-	Server string // protocol, hostname and port (https://vault.foo.com:8200)
+	Server     string // protocol, hostname and port (https://vault.foo.com:8200)
+	MaxRetries int    // default 0, passed to Vault api client
 }
 
+// VaultClient holds the config, token and Hashicorp Vault api client.
 type VaultClient struct {
 	client *api.Client
 	config *VaultConfig
@@ -29,7 +32,7 @@ type VaultClient struct {
 // NewClient returns a VaultClient object or error
 func NewClient(config *VaultConfig) (*VaultClient, error) {
 	vc := VaultClient{}
-	c, err := api.NewClient(&api.Config{Address: config.Server})
+	c, err := api.NewClient(&api.Config{Address: config.Server, MaxRetries: config.MaxRetries})
 	vc.client = c
 	vc.config = config
 	return &vc, err

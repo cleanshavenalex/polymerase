@@ -37,6 +37,7 @@ Flags:
   -u, --user-id-path string   Path to user id. Can use USER_ID_PATH environment variable instead.
   -v, --vault-addr string     Vault server address (including protocol and port). Can use VAULT_ADDR environment variable instead.
   -t, --vault-token string    Vault token. Can use VAULT_TOKEN environment variable instead.
+  -r, --vault-max-retries int Maximum Number of times Vault will retry an api call
 ```
 
 ## Examples
