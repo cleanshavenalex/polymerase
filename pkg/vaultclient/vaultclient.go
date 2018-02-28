@@ -15,6 +15,7 @@ import (
 const (
 	authretries       = 10
 	retrydelayseconds = 3
+	maxValueRetries   = 3
 )
 
 // VaultConfig stores configuration settings for the Vault Client
@@ -123,14 +124,16 @@ func (c *VaultClient) GetValue(path string) (interface{}, error) {
 	lc := c.client.Logical()
 	s, err := lc.Read(path)
 	if err != nil && c.config.GetValueRetries > 0 {
-		jitter := time.Duration(rand.Int63n(int64((2 * retrydelayseconds) * time.Second)))
-		time.Sleep(jitter / 2)
+		jitter := time.Duration(rand.Int63n(5.0)) * time.Second
+		time.Sleep(jitter)
+		expoSleep := retrydelayseconds
 		for i := 0; i < c.config.GetValueRetries; i++ {
 			s, err = lc.Read(path)
 			if err == nil {
 				break
 			}
-			time.Sleep((retrydelayseconds * 2) * time.Second)
+			time.Sleep(time.Duration(expoSleep) * time.Second)
+			expoSleep = expoSleep * 2
 		}
 	}
 	if err != nil {

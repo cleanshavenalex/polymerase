@@ -71,4 +71,5 @@ func TestVaultRetryGetValue(t *testing.T) {
 	if len(os.Getenv("VAULT_CLIENT_TEST")) == 0 {
 		t.Skip("skipping test, VAULT_CLIENT_TEST not set")
 	}
+
 }

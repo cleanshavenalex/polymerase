@@ -10,7 +10,7 @@ type Vault interface {
 // AuthenticatedVaultClient creates and authenicates a vault client using the given config
 func AuthenticatedVaultClient(config Config) (Vault, error) {
 
-	v, err := vaultclient.NewClient(&vaultclient.VaultConfig{Server: config.VaultAddr})
+	v, err := vaultclient.NewClient(&vaultclient.VaultConfig{Server: config.VaultAddr, GetValueRetries: config.VaultGetValueRetries})
 	if err != nil {
 		return nil, err
 	}
